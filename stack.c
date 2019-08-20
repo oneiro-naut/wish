@@ -1,7 +1,8 @@
-#include<string.h>
+//#include<string.h>
+#include"stack.h"
 #include<stddef.h>
 
-typedef struct STACK{ int top; char base[3][1000]; }STACK;
+
 
 void init_stack(STACK* s)
 {
