@@ -18,7 +18,7 @@
 
 
 #define MAXBUFFERLEN 1000//sufficient length
-#define MAXCMDSIZE 100	//sufficient size of cmd queue array
+#define MAXCMDSIZE 10	//sufficient size of cmd queue array
 #define DIRSTCKSIZE 20  //
 #define PATHLEN 1000  //
 
@@ -39,7 +39,7 @@ int wish_init();
 void shell_loop();
 void get_stream();
 void list_files(char *directory);
-int w_tokenizer(char *stream,char **argv);
+int w_tokenizer(char *stream,char* deli);
 int scan0(char **argv);
 int contains(char*,char);
 int execpipe(char**,char**);
@@ -93,14 +93,19 @@ int wish_init()
     user_name=getlogin();
 }
 
+
+
+
 void shell_loop()
 {
 
     int length;
-    char **pipeargs1,**pipeargs2;
-    int isPipe=0;
-    
-    char* argv[MAXCMDSIZE];
+//    char **pipeargs1,**pipeargs2;
+//    int isPipe=0;
+    char* separator="|&&<>>;";
+    char* cmddeli=" ";
+    //char* argv[MAXCMDSIZE];
+    char** argp[10];
     //argv=(char **)malloc(100*sizeof(char*));
 
     
@@ -129,8 +134,14 @@ void shell_loop()
     }
     else
     */
-    w_tokenizer(stream,argv);
+
+    char** separated_cmd_arr=w_tokenizer(stream,separator);
+    while (separated_cmd_arr[cmdcount])
+    {
+        argp[cmdcount]=w_tokenizer(separated_cmd_arr[cmdcount],deli);
+    }
     
+    /*
     //checking syntax: a trivial check indeed
     if(scan0(argv)==-1)
     {
@@ -147,7 +158,7 @@ void shell_loop()
             execpipe(pipeargs1,pipeargs2);
         }*/
         //printf("i m no here\n");
-        if(!strcmp(argv[0],"exit")){
+      /*  if(!strcmp(argv[0],"exit")){
             printf("Yippikaya Mr Falcon\n");
             exit(0);
         }
@@ -177,7 +188,7 @@ void shell_loop()
             else{
                 perror("forking error!\n");
             }
-        } 
+        } */
     }
 }
 
@@ -232,16 +243,16 @@ int execpipe (char ** argv1, char ** argv2) {
     }
 }
 
-int w_tokenizer(char* stream,char** tokarr)
+int w_tokenizer(char* stream,char* deli) //make a different tok function for separator that does not tokenize double quotes
 {
-    
+    char** tokarr =(char**) malloc(sizeof(char*)*MAXCMDSIZE);
 	int length =strlen(stream);
 	char* curr=stream;
 	char* temp;
 	char* tok;
 
-	const char* del=" |;&&><";
-
+	//char* del=" |;&&><";
+    char* del=deli;
 	int index=-1;
 	int err=-1;
 
