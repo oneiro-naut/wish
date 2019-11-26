@@ -1,0 +1,16 @@
+evilfile
+expfile.txt
+shell
+shell.c
+stack.c
+stack.h
+test
+wish
+evilfile
+expfile.txt
+shell
+shell.c
+stack.c
+stack.h
+test
+wish

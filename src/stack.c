@@ -1,7 +1,6 @@
-#include"stack.h"
+#include<string.h>
 #include<stddef.h>
-#define STKSIZE 20
-
+#include "stack.h"
 
 void init_stack(STACK* s)
 {
@@ -9,21 +8,21 @@ void init_stack(STACK* s)
 
 }
 
-void push(STACK* s,int value)
+void push(STACK* s,char *str)
 {
-	if(s->top!=STKSIZE)
+	if(s->top!=2)
 	{
-		s->arr[++(s->top)]=value;
+		strcpy(s->base[++(s->top)],str);
 	}
 }
 
-int pop(STACK* s)
+char *pop(STACK* s)
 {
 	if(s->top!=-1)
 		{
 			(s->top)--;
-			return (s->arr[(s->top)+1]);
+			return (s->base[(s->top)+1]);
 		}
-	else return -1;
+	else return NULL;
 }
 

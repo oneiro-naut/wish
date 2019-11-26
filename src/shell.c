@@ -10,9 +10,11 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <errno.h>
-#include<fcntl.h> 
+#include <fcntl.h> 
+#include <termios.h>
 //#include"wishparser.h"
-#include"stack.h"
+#include "stack.h"
+#include <signal.h>
 //#include"queue.h"
 
 //******************************************************************************************************************************************
@@ -23,9 +25,8 @@
 
 #define INPUTSIZE 1000//sufficient length
 #define CMDPERINPUT 10	//sufficient size of cmd queue array
-
 #define PATHLEN 1000 
-
+#define DIRSTCKSIZE 20  //
 
 
 
@@ -38,7 +39,7 @@ char stream[INPUTSIZE];
 pid_t shell_PID;
 int EXIT_STAT;
 char PWD[1000];
-//STACK DIRSTACK;
+STACK DIRSTACK;
 
 
 //******************************************** Function Declarations ********************************************************************
@@ -47,8 +48,8 @@ void shell_loop();
 int get_stream();
 void list_files(char *directory);
 char** w_tokenizer(char* inp_str,char* deli);
-//void changedir(char** argv);
-
+void changedir(char** argv);
+void sigintHandler(int);
 int countPipes(char * str,int* fileoptflag);
 int executePipe(char*** argp,int npipes,int outputtoafile);
 //******************************************************************************************************************************************
@@ -74,17 +75,25 @@ int main()
 {
   //  printf("Welcome to wish shell !\n");
     //a function to retreive hostname and user 
+    
+
     wish_init();
     //getprompt();
     shell_loop();
 
 }
 
+void sigintHandler(int sig_num) 
+{ 
+    signal(SIGINT, sigintHandler); 
+    fflush(stdout); 
+} 
+
 int wish_init()
 {
     getcwd(PWD,PATHLEN);
 
-    //init_stack(&DIRSTACK);
+    init_stack(&DIRSTACK);
     
     // Retrieving hostname from /etc/hostaname file
     FILE *file = fopen("/etc/hostname","r");
@@ -114,6 +123,7 @@ void shell_loop()
     char** argp[10];
     wish_init();    
     
+        signal(SIGINT, sigintHandler); 
      
     
     while(1){
@@ -142,12 +152,12 @@ void shell_loop()
 		while (complex_cmd_arr[cmdcount])
         {
             int y=0;
-			printf("%s \n",complex_cmd_arr[cmdcount]);	
+		//	printf("%s \n",complex_cmd_arr[cmdcount]);	
 			npipes=countPipes(complex_cmd_arr[cmdcount],&optfile);
-			printf("number of pipes =%d\n",npipes);
+			//printf("number of pipes =%d\n",npipes);
 			//calculate number of pipes and stuff here
 			//also lots of free() calls r to be added
-			printf("creating pipe n io separated sub cmd arr...\n");
+			//printf("creating pipe n io separated sub cmd arr...\n");
 			//basically "ping -c 3","grep "google" ","head -3",null
 			//individual cmds with their arguments in a pipe chain
 			complex_cmd_component_cmd_arr=w_tokenizer(complex_cmd_arr[cmdcount],sep_io);
@@ -160,23 +170,23 @@ void shell_loop()
 				//their offset is returned by w_tokenizer
 				//example "ping","google.com","-c","3",null
 				//w_tokenizer returns &argv[0] which is a double ptr
-				printf("creating argp[]\n");
+				//printf("creating argp[]\n");
 				y++;
         	}
 			argp[y]=	NULL;//making argp NULL terminated
 			y=0;
             //argp has format argv1,argv2,argv3,argv3,...null
 			      if(!strcmp(argp[y][0],"exit")){
-            printf("Yippikaya Mr Falcon\n");
+           // printf("Yippikaya Mr Falcon\n");
             exit(0);
         }
- 
-        
-        
-    
-			else executePipe(argp,npipes,optfile);
+        else if(!strcmp(argp[y][0],"cd")){
+            changedir(argp[y]);
 
-			printf("creating complex_cmd_component_arr[]\n");
+        }
+ else executePipe(argp,npipes,optfile);
+
+			//printf("creating complex_cmd_component_arr[]\n");
 			cmdcount++;
         }
 	
@@ -273,11 +283,11 @@ char** w_tokenizer(char* inp_str,char* deli) //make a different tok function for
 		}
 	}while(tokarr[index]);
 	
-	int i=0;
-	printf("\n");
-	for(;tokarr[i]!=NULL;i++)puts(tokarr[i]);
-    if(!tokarr[i])printf("NULL ");
-	printf("\n");
+	// int i=0;
+	// printf("\n");
+	// for(;tokarr[i]!=NULL;i++)puts(tokarr[i]);
+    // if(!tokarr[i])printf("NULL ");
+	// printf("\n");
 
     return tokarr;
 }
@@ -331,7 +341,7 @@ void list_files(char *directory){
 
 
 }
-/*
+
 void changedir(char **argv)
 {
     //char *temp;
@@ -391,10 +401,6 @@ void changedir(char **argv)
     
 
 }
-*/
-
-
-
 
 
 int executePipe(char*** argp,int npipes,int outputtoafile)
@@ -405,8 +411,8 @@ int executePipe(char*** argp,int npipes,int outputtoafile)
 		perror("Syntax Error!");
 		return -1;
 	}
-	printf("%d number of pipes inside exep func..\n",npipes);
-	printf("%d output to file inside exep func..\n",outputtoafile);
+	//printf("%d number of pipes inside exep func..\n",npipes);
+	//printf("%d output to file inside exep func..\n",outputtoafile);
 	int pipefd[2*npipes];
     int a = 0;
     for( ;a < npipes; a++ ){    //creating pipes
@@ -439,7 +445,7 @@ int executePipe(char*** argp,int npipes,int outputtoafile)
 
         if(ci){
             
-            printf("not cmd 1:%s i=%d\n",*argp[ci],ci);
+         //   printf("not cmd 1:%s i=%d\n",*argp[ci],ci);
             
             dup2(pipefd[(ci-1)*2],0);
             
@@ -474,7 +480,7 @@ int executePipe(char*** argp,int npipes,int outputtoafile)
         
             }
         ci++;
-        printf("inside parent:i=%d\n",ci);
+       // printf("inside parent:i=%d\n",ci);
     
     }    
         
@@ -489,9 +495,9 @@ int executePipe(char*** argp,int npipes,int outputtoafile)
                     do{//waiting for last to exit
                     waitpid(pid[b],&EXIT_STAT,WUNTRACED);
                     }while(!WIFEXITED(EXIT_STAT)&&WIFSIGNALED(EXIT_STAT));
-                    printf("cmd[%d] dead\n",b);
+                   // printf("cmd[%d] dead\n",b);
             }   
-    printf("Parent dead!\n");
+   // printf("Parent dead!\n");
 
     return 0;
 
@@ -577,8 +583,8 @@ int countPipes(char * str,int* fileoptflag)
         }
         i++;
     }
-    printf("napp=%d\n",napp);
-	printf("nwrite=%d\n",nwrite);
+   // printf("napp=%d\n",napp);
+//	printf("nwrite=%d\n",nwrite);
 	
 	if(napp>1||nwrite>1)return -1;
     if(napp&&nwrite)return -1;
