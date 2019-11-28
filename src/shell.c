@@ -345,9 +345,9 @@ void list_files(char *directory){
 void changedir(char **argv)
 {
     //char *temp;
-    int dir_found=0;
+    int dir_found=2;
     if(strlen(argv[1])>1){
-        if(argv[1][0]=='/')
+       if(argv[1][0]=='/')
         {
             
             dir_found=chdir(argv[1]);
@@ -360,6 +360,8 @@ void changedir(char **argv)
             strcat(PWD,argv[1]);
             dir_found=chdir(PWD);
         }
+         //dir_found=chdir(argv[1]);
+
     }
     else if(strlen(argv[1])==1){
         if(argv[1][0]=='-')
@@ -367,28 +369,34 @@ void changedir(char **argv)
         
             if(DIRSTACK.top!=-1)dir_found=chdir(pop(&DIRSTACK));
             else printf("No previous working directory!\n");
-            push(&DIRSTACK,PWD);
-            getcwd(PWD,PATHLEN);
+            //push(&DIRSTACK,PWD);
+            //getcwd(PWD,PATHLEN);
         }
         else if(argv[1][0]=='~')
         {
             dir_found=chdir(getenv("HOME"));
-            push(&DIRSTACK,PWD);
-            getcwd(PWD,PATHLEN);
+            //push(&DIRSTACK,PWD);
+            //getcwd(PWD,PATHLEN);
         }
         else if(argv[1][0]=='/')
         {
             dir_found=chdir(argv[1]);
-            push(&DIRSTACK,PWD);
-            getcwd(PWD,PATHLEN);
+            //push(&DIRSTACK,PWD);
+            //getcwd(PWD,PATHLEN);
         }
         else if(argv[1][0]=='.')
         {
-            push(&DIRSTACK,PWD);
+            //push(&DIRSTACK,PWD);
+            //strcat(PWD,"/");
+            //strcat(PWD,argv[1]);
+            //dir_found=chdir(PWD);
+            //getcwd(PWD,PATHLEN);
+        }
+        else {
+            //dir_found=chdir(argv[1]);
             strcat(PWD,"/");
             strcat(PWD,argv[1]);
             dir_found=chdir(PWD);
-            getcwd(PWD,PATHLEN);
         }
     }
     if(dir_found==-1){
@@ -398,6 +406,7 @@ void changedir(char **argv)
         push(&DIRSTACK,PWD);
         getcwd(PWD,PATHLEN);
     }
+    
     
 
 }
