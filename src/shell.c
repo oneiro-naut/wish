@@ -18,9 +18,9 @@
 //#include"queue.h"
 
 //******************************************************************************************************************************************
-#define PIPE 1
-#define WRITE 2
-#define APPEND 3
+//#define PIPE 1
+//#define WRITE 2
+//#define APPEND 3
 
 
 #define INPUTSIZE 1000//sufficient length
@@ -46,6 +46,7 @@ STACK DIRSTACK;
 int wish_init();
 void shell_loop();
 int get_stream();
+int checkTokens(char **argv);
 void list_files(char *directory);
 char** w_tokenizer(char* inp_str,char* deli);
 void changedir(char** argv);
@@ -121,6 +122,7 @@ void shell_loop()
 	char* cmddeli=" ";//whitespace
     
     char** argp[10];
+    int syntax_correct =1; // by default correct
     wish_init();    
     
         signal(SIGINT, sigintHandler); 
@@ -142,7 +144,7 @@ void shell_loop()
 		int optfile = 0;
 		
         //tokenization of user input
-        int cmdcount=0;
+        int cmdcount = 0;
 	//	printf("creating complex cmd arr...\n");
         char** complex_cmd_arr=w_tokenizer(stream,sep_primary);
 		char** complex_cmd_component_cmd_arr;
@@ -151,7 +153,8 @@ void shell_loop()
 		//separate pipe chains
 		while (complex_cmd_arr[cmdcount])
         {
-            int y=0;
+            int y = 0;
+            syntax_correct = 1;
 		//	printf("%s \n",complex_cmd_arr[cmdcount]);	
 			npipes=countPipes(complex_cmd_arr[cmdcount],&optfile);
 			//printf("number of pipes =%d\n",npipes);
@@ -170,25 +173,41 @@ void shell_loop()
 				//their offset is returned by w_tokenizer
 				//example "ping","google.com","-c","3",null
 				//w_tokenizer returns &argv[0] which is a double ptr
+                //argp has format argv1,argv2,argv3,argv3,...null
 				//printf("creating argp[]\n");
 				y++;
-        	}
-			argp[y]=	NULL;//making argp NULL terminated
+        	}free(complex_cmd_component_cmd_arr);
+			argp[y]=NULL;    //making argp NULL terminated
 			y=0;
-            //argp has format argv1,argv2,argv3,argv3,...null
-			      if(!strcmp(argp[y][0],"exit")){
-           // printf("Yippikaya Mr Falcon\n");
-            exit(0);
-        }
-        else if(!strcmp(argp[y][0],"cd")){
-            changedir(argp[y]);
+            
+            for(int i=0;argp[i]!=NULL;i++){
+                if(checkTokens(argp[i])==-1)
+                {
+                    syntax_correct = 0;
+                    break;
+                }
+            }
+            
+            if(syntax_correct==1){
+                
+			    if(!strcmp(argp[y][0],"exit")){
+                    // printf("Yippikaya Mr Falcon\n");
+                    exit(0);
+                }
+                else if(!strcmp(argp[y][0],"cd")){
+                    changedir(argp[y]);
 
-        }
- else executePipe(argp,npipes,optfile);
-
+                }
+                else executePipe(argp,npipes,optfile);
+            }
+            else if(syntax_correct==0){perror("wrong syntax!\n"); }
 			//printf("creating complex_cmd_component_arr[]\n");
-			cmdcount++;
-        }
+		
+        	cmdcount++;
+            for(int i=0;argp[i]!=NULL;i++)free(argp[i]);
+        
+        } free(complex_cmd_arr);
+        
 	
 
     }
@@ -207,28 +226,6 @@ int get_stream(){
     return 0;
 }
 
-
-
-
-
-int contains(char* string , char regex){
-    int i=0;
-    for (;i<strlen(string);i++){
-        if(regex==*(string+i))
-        return 1;
-    }
-    return 0;
-
-}
-
-char isCMDseparator(char ch){
-    
-    if(ch != ';' && ch != '|' && ch != '>' && ch != '<'){
-        return ch;
-    }
-    return 0;
-
-}
 
 //tokenizer returns argv now**
 
@@ -295,7 +292,7 @@ char** w_tokenizer(char* inp_str,char* deli) //make a different tok function for
 
 
 
-int scan0(char **argv){
+int checkTokens(char **argv){
 
     /*
     
