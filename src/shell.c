@@ -48,7 +48,7 @@ void shell_loop();
 int get_stream();
 int checkTokens(char **argv);
 void list_files(char *directory);
-char** w_tokenizer(char* inp_str,char* deli);
+char** w_tokenizer(char* inp_str,char* deli,int dquote);
 void changedir(char** argv);
 void sigintHandler(int);
 int countPipes(char * str,int* fileoptflag);
@@ -146,7 +146,7 @@ void shell_loop()
         //tokenization of user input
         int cmdcount = 0;
 	//	printf("creating complex cmd arr...\n");
-        char** complex_cmd_arr=w_tokenizer(stream,sep_primary);
+        char** complex_cmd_arr=w_tokenizer(stream,sep_primary,0);
 		char** complex_cmd_component_cmd_arr;
        // printf("created complex cmd arr\n");
 		//basically "ls | grep "something"| tail -5 ","ping google.com -c 3|grep "google"|head -3",null
@@ -163,10 +163,10 @@ void shell_loop()
 			//printf("creating pipe n io separated sub cmd arr...\n");
 			//basically "ping -c 3","grep "google" ","head -3",null
 			//individual cmds with their arguments in a pipe chain
-			complex_cmd_component_cmd_arr=w_tokenizer(complex_cmd_arr[cmdcount],sep_io);
+			complex_cmd_component_cmd_arr=w_tokenizer(complex_cmd_arr[cmdcount],sep_io,0);
 			while (complex_cmd_component_cmd_arr[y])
         	{
-            	argp[y]=w_tokenizer(complex_cmd_component_cmd_arr[y],cmddeli);
+            	argp[y]=w_tokenizer(complex_cmd_component_cmd_arr[y],cmddeli,1);
 				//cmd broken into name,arg1,arg2,...,null format tokens
 				//can be used as argv
 				//argp contains ptrs to various argvs
@@ -229,8 +229,8 @@ int get_stream(){
 
 //tokenizer returns argv now**
 
-char** w_tokenizer(char* inp_str,char* deli) //make a different tok function for separator that does not tokenize double quotes
-{
+char** w_tokenizer(char* inp_str,char* deli,int dquote) //tokenization of double quotes can now be turned off
+{                                                   // *****cases like echo "some;thing" remain unhandled***
     char** tokarr =(char**) malloc(sizeof(char*)*CMDPERINPUT);
 	int length =strlen(stream);
 	char* curr=inp_str;
@@ -256,36 +256,42 @@ char** w_tokenizer(char* inp_str,char* deli) //make a different tok function for
 		}
 		//else curr++;
 
-		else
+		else 
 		{
 			//int i = 0;
-			temp=curr+1;
-			do{
+			
+            temp=curr+1;
+			//printf("@char= <%c> \n",*temp);
+            do{
 				curr++;
 				
 			}while((*curr)!='\"'&&(*curr)!='\0');
 
 			index++;
-			if(*curr=='\"'){
+			if(*curr=='\"'&&dquote){
 				*curr='\0';
 				//index++;
 				tokarr[index]=temp;
 				curr++;
 			}
-			else {
+			else if(*curr=='\"'&&dquote==0)
+            {
+                curr++; //dont tokenize just skip tokenizing whats between the quotes
+            }
+            else {
 				err++;
 				tokarr[index]=NULL;
 			}
 			
 		}
 	}while(tokarr[index]);
-	
-	// int i=0;
-	// printf("\n");
-	// for(;tokarr[i]!=NULL;i++)puts(tokarr[i]);
-    // if(!tokarr[i])printf("NULL ");
-	// printf("\n");
-
+	/*
+	 int i=0;
+	 printf("\n");
+	 for(;tokarr[i]!=NULL;i++)puts(tokarr[i]); //for debugging purpose
+     if(!tokarr[i])printf("NULL ");
+	 printf("\n");
+    */
     return tokarr;
 }
 
@@ -465,12 +471,12 @@ int executePipe(char*** argp,int npipes,int outputtoafile)
         }
         if(ci==npipes&&outputtoafile==1)
         {
-            filedescriptor= open(argp[ci+1][0],O_WRONLY|O_CREAT); 
+            filedescriptor= open(argp[ci+1][0],O_WRONLY|O_CREAT,S_IRWXU); //added mode because of O_CREAT flag 
             dup2(filedescriptor,1);
-        }        
+        }                                           //S_IRWXU --> UMASK = 0700 ALL permission to user who created file
         if(ci==npipes&&outputtoafile==2)
         {
-            filedescriptor= open(argp[ci+1][0],O_WRONLY|O_CREAT|O_APPEND); 
+            filedescriptor= open(argp[ci+1][0],O_WRONLY|O_CREAT|O_APPEND,S_IRWXU);//added mode because of O_CREAT flag 
             dup2(filedescriptor,1);
         }        
 
