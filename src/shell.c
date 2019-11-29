@@ -471,12 +471,13 @@ int executePipe(char*** argp,int npipes,int outputtoafile)
         }
         if(ci==npipes&&outputtoafile==1)
         {
-            filedescriptor= open(argp[ci+1][0],O_WRONLY|O_CREAT,S_IRWXU); //added mode because of O_CREAT flag 
+            filedescriptor= open(argp[ci+1][0],O_WRONLY|O_CREAT,S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH); //added mode because of O_CREAT flag 
             dup2(filedescriptor,1);
-        }                                           //S_IRWXU --> UMASK = 0700 ALL permission to user who created file
+        }                                           //S_IRWXU --> permissions are same as touch cmd to user who created file
+                                                        // --rw-r--r-
         if(ci==npipes&&outputtoafile==2)
         {
-            filedescriptor= open(argp[ci+1][0],O_WRONLY|O_CREAT|O_APPEND,S_IRWXU);//added mode because of O_CREAT flag 
+            filedescriptor= open(argp[ci+1][0],O_WRONLY|O_CREAT|O_APPEND,S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH);//added mode because of O_CREAT flag 
             dup2(filedescriptor,1);
         }        
 
