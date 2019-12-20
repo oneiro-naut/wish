@@ -6,10 +6,10 @@ Command expressions have the syntax:
 where (sep) is a command separator or an operator. Example - pipeline operator'|',etc.            
 
 Some features are:
->Supports sequential command execution 'cmd1 ;cmd2;cmd3;cmd4 && cmd5'
->Supports pipelines constructs 'A|B|C....' where A,B,C,... are command constructs
->Supports Output redirection to a file '>' , '>>'
->Supports File descriptor redirection
->Supports background process execution 'cmd &'
->Has it's own Finite State Machine based token generator and syntax checking functions
+--Supports sequential command execution 'cmd1 ;cmd2;cmd3;cmd4 && cmd5'
+--Supports pipelines constructs 'A|B|C....' where A,B,C,... are command constructs
+--Supports Output redirection to a file '>' , '>>'
+--Supports File descriptor redirection
+--Supports background process execution 'cmd &'
+--Has it's own Finite State Machine based token generator and syntax checking functions
 
