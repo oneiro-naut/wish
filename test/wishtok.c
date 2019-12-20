@@ -255,7 +255,7 @@ char** wish_tok_quote_muted(char* inp_str)
       if(!tokarr[i])printf("NULL ");
  	 printf("\n");			
     
-	return NULL;
+	return tokarr;
 }
 
 
