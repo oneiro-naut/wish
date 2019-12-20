@@ -609,7 +609,7 @@ void changedir(char **argv)
         }
         else
         {
-            //push(&DIRSTACK,PWD);
+            push(&DIRSTACK,PWD);
             strcat(PWD,"/");
             strcat(PWD,argv[1]);
             dir_found=chdir(PWD);
@@ -623,17 +623,20 @@ void changedir(char **argv)
         
             if(DIRSTACK.top!=-1)dir_found=chdir(pop(&DIRSTACK));
             else printf("No previous working directory!\n");
+            push(&DIRSTACK,PWD);
             //push(&DIRSTACK,PWD);
             //getcwd(PWD,PATHLEN);
         }
         else if(argv[1][0]=='~')
         {
+            push(&DIRSTACK,PWD);
             dir_found=chdir(getenv("HOME"));
             //push(&DIRSTACK,PWD);
             //getcwd(PWD,PATHLEN);
         }
         else if(argv[1][0]=='/')
         {
+            push(&DIRSTACK,PWD);
             dir_found=chdir(argv[1]);
             //push(&DIRSTACK,PWD);
             //getcwd(PWD,PATHLEN);
@@ -648,6 +651,7 @@ void changedir(char **argv)
         }
         else {
             //dir_found=chdir(argv[1]);
+            push(&DIRSTACK,PWD);
             strcat(PWD,"/");
             strcat(PWD,argv[1]);
             dir_found=chdir(PWD);
@@ -657,7 +661,7 @@ void changedir(char **argv)
         perror("Error:");
     }
     else if(dir_found==0){
-        push(&DIRSTACK,PWD);
+        
         getcwd(PWD,PATHLEN);
     }
     
