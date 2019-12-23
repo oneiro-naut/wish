@@ -1,7 +1,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h> //for strcpy()
-
+#include "readline.h"
 #define CMDPERINPUT 10
 #define TOKSIZE 100
 
@@ -268,9 +268,17 @@ int main()
 {
 	char teststr[]="ayush is \"nihilitsti'c c'reep\" asd;aadsd ";
 	wish_tok(teststr);
-	
+	char* testbuf=NULL;
 	char teststrmuted[]= "ayush is; \"nihilitstic; creep\"asd;aadsd ";
 	wish_tok_quote_muted(teststrmuted); //this one is remarkable
-		
+	initreadLine(128);	
+	while(1)
+	{
+		printf("craZyprompt->-<->");
+		testbuf=readLine();
+		printf("buffer is=%s\n",testbuf);
+		free(testbuf);
+	}
+	
 	return 0;
 }

@@ -1,26 +1,16 @@
 //******************************************** Header Files Inclusions ********************************************************************
 
 #include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
+#include "readline.h"
 #include <dirent.h> //for directory related syscalls
 #include <sys/syscall.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <errno.h>
 #include <fcntl.h> 
-#include <termios.h>
-//#include"wishparser.h"
 #include "stack.h"
 #include <signal.h>
-//#include"queue.h"
 
 //******************************************************************************************************************************************
-//#define PIPE 1
-//#define WRITE 2
-//#define APPEND 3
 
 
 #define INPUTSIZE 1000//sufficient length
@@ -35,7 +25,7 @@ char *user_name;
 extern char** environ;
 //char* envp[]={"/bin:/usr/bin/"};
 char** CMD[10];//command queue array basically array of argv[]
-char stream[INPUTSIZE];
+char* stream;
 pid_t shell_PID;
 int EXIT_STAT;
 char PWD[1000];
@@ -45,7 +35,7 @@ STACK DIRSTACK;
 //******************************************** Function Declarations ********************************************************************
 int wish_init();
 void shell_loop();
-int get_stream();
+void printPrompt();
 int checkTokens(char **argv);
 void list_files(char *directory);
 char** w_tokenizer(char* inp_str,char* deli,int dquote);
@@ -99,6 +89,8 @@ int wish_init()
     getcwd(PWD,PATHLEN);
 
     init_stack(&DIRSTACK);
+
+    initreadLine(INPUTSIZE);
     
     // Retrieving hostname from /etc/hostaname file
     FILE *file = fopen("/etc/hostname","r");
@@ -113,7 +105,15 @@ int wish_init()
     user_name=getlogin();
 }
 
+void printPrompt()
+{
+        printf("\033[0;31m"); 
+    	printf("\033[1m");
+    	printf("%s  ➜  ",host_name);
+    	printf("\033[0m");
+	    printf("\033[0m"); 
 
+}
 
 
 void shell_loop()
@@ -134,16 +134,13 @@ void shell_loop()
     
     while(1){
         /* code */
-        printf("\033[0;31m"); 
-    	printf("\033[1m");
-    	printf("%s  ➜  ",host_name);
-    	printf("\033[0m");
-	    printf("\033[0m"); 
+        printPrompt();   
     //getting user input 
 
 
         //getting user input 
-        get_stream();
+//        get_stream();
+        stream=readLine();
 		int npipes=0;
 		int optfile = 0;
 		
@@ -161,7 +158,7 @@ void shell_loop()
             syntax_correct = 1;
 		//	printf("%s \n",complex_cmd_arr[cmdcount]);	
 			npipes=countPipes(complex_cmd_arr[cmdcount],&optfile);
-			printf("number of pipes =%d\n",npipes);
+//		printf("number of pipes =%d\n",npipes);
 			//calculate number of pipes and stuff here
 			//also lots of free() calls r to be added
 			//printf("creating pipe n io separated sub cmd arr...\n");
@@ -211,9 +208,7 @@ void shell_loop()
             for(int i=0;argp[i]!=NULL;i++)free(argp[i]);
         
         } free(complex_cmd_arr);
-        
-	
-
+        free(stream);
     }
 }
 
@@ -338,11 +333,11 @@ char** wish_tok(char* inp_str)
 		}
 		    
 
- 	 int i=0;
- 	 printf("\n");
- 	 for(;tokarr[i]!=NULL;i++)puts(tokarr[i]); //for debugging purpose
-      if(!tokarr[i])printf("NULL ");
- 	 printf("\n");			
+ 	//  int i=0;
+ 	//  printf("\n");
+ 	//  for(;tokarr[i]!=NULL;i++)puts(tokarr[i]); //for debugging purpose
+    //   if(!tokarr[i])printf("NULL ");
+ 	//  printf("\n");			
     
 	return tokarr;
 }
@@ -452,11 +447,11 @@ char** wish_tok_quote_muted(char* inp_str)
 			tokarr[++index_of_token]=NULL;
 		}
 
- 	 int i=0;
- 	 printf("\n");
- 	 for(;tokarr[i]!=NULL;i++)puts(tokarr[i]); //for debugging purpose
-      if(!tokarr[i])printf("NULL ");
- 	 printf("\n");			
+ 	//  int i=0;
+ 	//  printf("\n");
+ 	//  for(;tokarr[i]!=NULL;i++)puts(tokarr[i]); //for debugging purpose
+    //   if(!tokarr[i])printf("NULL ");
+ 	//  printf("\n");			
     
 	return tokarr;
 }
@@ -467,15 +462,15 @@ char** wish_tok_quote_muted(char* inp_str)
 
 
 
-int get_stream(){
-	//this function gets user input  
+// int get_stream(){
+// 	//this function gets user input  
 	
-    fgets(stream,INPUTSIZE,stdin);//input overflow needs to be handled
-    int length = strlen(stream);
-    stream[length-1] = '\0'; //removing \n character from input
-//	printf("exiting get_stream()\n");
-    return 0;
-}
+//     fgets(stream,INPUTSIZE,stdin);//input overflow needs to be handled
+//     int length = strlen(stream);
+//     stream[length-1] = '\0'; //removing \n character from input
+// //	printf("exiting get_stream()\n");
+//     return 0;
+// }
 
 
 //tokenizer returns argv now**
@@ -537,11 +532,11 @@ char** w_tokenizer(char* inp_str,char* deli,int dquote) //tokenization of double
 		}
 	}while(tokarr[index]);
 	
-	 int i=0;
-	 printf("\n");
-	 for(;tokarr[i]!=NULL;i++)puts(tokarr[i]); //for debugging purpose
-     if(!tokarr[i])printf("NULL ");
-	 printf("\n");
+	//  int i=0;
+	//  printf("\n");
+	//  for(;tokarr[i]!=NULL;i++)puts(tokarr[i]); //for debugging purpose
+    //  if(!tokarr[i])printf("NULL ");
+	//  printf("\n");
     
     return tokarr;
 }
