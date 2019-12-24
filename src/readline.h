@@ -12,7 +12,7 @@
 #define cursorforward(x) printf("\033[%dC", (x))
 #define cursorbackward(x) printf("\033[%dD", (x))
 #define backspc() printf("\b \b")
-#define CTRL_KEY(k) ((k) & 0x1f)
+#define CTRL_KEY(k) ((k) & 0x1f) //masking unmasking//ASCII table is special
 
 
 static size_t buffersize;

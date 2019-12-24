@@ -9,7 +9,7 @@
 #include <fcntl.h> 
 #include "stack.h"
 #include <signal.h>
-
+#include <time.h>
 //******************************************************************************************************************************************
 
 
@@ -42,7 +42,7 @@ char** w_tokenizer(char* inp_str,char* deli,int dquote);
 char** wish_tok_quote_muted(char* inp_str);
 char** wish_tok(char* inp_str);
 void changedir(char** argv);
-void sigintHandler(int);
+void sighandler(int);
 int countPipes(char * str,int* fileoptflag);
 int executePipe(char*** argp,int npipes,int outputtoafile);
 
@@ -69,8 +69,14 @@ int main()
 {
   //  printf("Welcome to wish shell !\n");
     //a function to retreive hostname and user 
-    
+   struct sigaction act;//must not be global since it belongs only to parent process
 
+   memset(&act, 0, sizeof(act));
+   act.sa_handler = sighandler;
+    act.sa_flags=0;//not SA_RESTART
+   sigaction(SIGINT,  &act, 0);//should work only for parent process 
+   sigaction(SIGTSTP, &act, 0);//
+ 
     wish_init(); //initialize globals
     //getprompt();
     shell_loop();
@@ -78,10 +84,11 @@ int main()
     return 0;
 }
 
-void sigintHandler(int sig_num) 
+void sighandler(int sig_num) 
 { 
-    signal(SIGINT, sigintHandler); 
-    fflush(stdout); 
+    
+     //sleep(100);
+    //fflush(stdout); 
 } 
 
 int wish_init()
@@ -127,9 +134,7 @@ void shell_loop()
     
     char** argp[10];
     int syntax_correct =1; // by default correct
-    wish_init();    
-    
-        signal(SIGINT, sigintHandler); 
+    wish_init();     
      
     
     while(1){
@@ -141,7 +146,8 @@ void shell_loop()
         //getting user input 
 //        get_stream();
         stream=readLine();
-		int npipes=0;
+		//stream=NULL;//NULL check
+        int npipes=0;
 		int optfile = 0;
 		
         //tokenization of user input
@@ -208,13 +214,13 @@ void shell_loop()
             for(int i=0;argp[i]!=NULL;i++)free(argp[i]);
         
         } free(complex_cmd_arr);
-        free(stream);
+        if(stream!=NULL){free(stream); //free cant free NULL lol
+        stream= NULL;}
     }
 }
 
 char** wish_tok(char* inp_str)
 {
-
     char** tokarr =(char**) malloc(sizeof(char*)*CMDPERINPUT);
    // if(inp_str==NULL){tokarr[] return tokarr;
    // if(*inp_str==0)return NULL;
@@ -347,10 +353,11 @@ char** wish_tok(char* inp_str)
 //more delimitors can be added by adding more if conditions 
 char** wish_tok_quote_muted(char* inp_str) 
 {
-    //if(inp_str==NULL)return NULL;
+    
     //if(*inp_str==0)return NULL;
     char** tokarr =(char**) malloc(sizeof(char*)*CMDPERINPUT);
-	char *p=strdup(inp_str);//so that original buffer is not affected
+	if(inp_str==NULL){ tokarr[0]=NULL; return tokarr;}
+    char *p=strdup(inp_str);//so that original buffer is not affected
 	
 	
 	char* start_of_word=NULL;

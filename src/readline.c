@@ -2,10 +2,6 @@
 
 //EXPERIMENT SUCCESSFUL*****to be added to wish soon
 
-static void abFree(struct lbuf *ab) {
-  free(ab->b);
-}
-
 
 static void insertchar(lbuf *v_buf,char c)
 {
@@ -100,7 +96,7 @@ static int editorReadKey() {
   int nread;
   char c=0;
   nread=getch(&c,1,0);
-
+  if(nread==-1)return nread;
 
   if (c == KEY_ESCAPE) {
     char seq[3];
@@ -160,7 +156,12 @@ char *readLine() {
   while (1) {
 
     int c = editorReadKey();
-         
+    if(c==-1){putchar('\n'); 
+    free(buf.b);  
+    return NULL; } //***when ctrl c or ctrl z is pressed getchar will return -1 that is it got interrupted by sigint or something 
+    // this behaviour is by default set to restarting the syscall that is restarting the get char 
+    //can be turned off by setting sa_flag =0 which is  by default set to SA_RESTART***this is some serious OS concept**more to learn
+    //https://stackoverflow.com/questions/7978315/ctrl-c-eaten-by-getchar <--this question discusses this     
     if (c == DEL_KEY || c == CTRL_KEY('h') || c == BACKSPACE) {
       deletechar(&buf);
     } 
@@ -183,6 +184,8 @@ char *readLine() {
               cursorforward(1);
             }
         }
+    else if(CTRL_KEY(c)=='\x5e'){putchar('^');putchar('C');putchar('\n'); return buf.b; }
+    else if(CTRL_KEY(c)=='\x1a'){}
     else if (!iscntrl(c) && c < 128) {     
       insertchar(&buf,c);
       //basically overwriting to replace with true insertion
