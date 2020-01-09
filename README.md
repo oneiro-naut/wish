@@ -11,6 +11,11 @@ Some features are:\
   Supports Output redirection to a file '>' , '>>'.\
   Supports File descriptor redirection.\
   Supports background process execution 'cmd &'.\
-  Has it's own Finite State Machine based token generator and syntax checking functions.
+  Has it's own Finite State Machine based token generator and syntax checking functions. \
+
+
+To be added: \
+  Shell Scripting \
+  Shell customisation \
   
 
