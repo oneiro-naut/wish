@@ -1,4 +1,4 @@
-# wish_beta
+# wish
 
 Minimal Unix shell written in C to study systemcalls and other POSIX concepts.\
 Command expressions have the syntax: \
