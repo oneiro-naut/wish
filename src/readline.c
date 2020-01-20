@@ -1,4 +1,6 @@
 #include "readline.h"
+#include <sys/wait.h>
+#include <sys/types.h>
 
 //EXPERIMENT SUCCESSFUL*****to be added to wish soon
 
@@ -165,6 +167,27 @@ char *readLine() {
     if (c == DEL_KEY || c == CTRL_KEY('h') || c == BACKSPACE) {
       deletechar(&buf);
     } 
+    else if(c==CTRL_KEY('d'))
+    {
+      putchar('\n');
+      exit(0);
+    }
+    else if(c==CTRL_KEY('l'))
+    {
+      int cccc=fork();
+      int exit_clr;
+      if(cccc==0)
+      {
+        char* argvv[]={"/usr/bin/clear",NULL};
+        execvp(argvv[0],argvv);
+        exit(666);
+      }
+        do{//waiting for last to exit
+                    waitpid(cccc,&exit_clr,WUNTRACED);
+                    }while(!WIFEXITED(exit_clr)&&WIFSIGNALED(exit_clr));
+     // printf("outside clear\n");
+      return buf.b;
+    }
     else if (c == KEY_ENTER) {
       if (buf.len >=0) {
         putchar('\n');

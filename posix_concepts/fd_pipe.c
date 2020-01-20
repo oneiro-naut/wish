@@ -115,7 +115,7 @@ int countPipes(char * str,int* fileoptflag)
 
     npipes = 0;
 	napp =0;
-	nwrite =0; //always FUUCCKKIN INITIALIZE YOUR VARIABLES BEFORE U START TESTING !!!!!!
+	nwrite =0; //always F*****KIN INITIALIZE YOUR VARIABLES BEFORE U START TESTING !!!!!!
 	i=0; //added these init later ;/ thats why i m pissed
 	j=0;
     while(str[i])
