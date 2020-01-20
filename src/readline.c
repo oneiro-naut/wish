@@ -1,8 +1,5 @@
-#include "readline.h"
-#include <sys/wait.h>
-#include <sys/types.h>
-
-//EXPERIMENT SUCCESSFUL*****to be added to wish soon
+#include "../include/readline.h"
+#include "../include/execute.h"
 
 
 static void insertchar(lbuf *v_buf,char c)
@@ -174,18 +171,8 @@ char *readLine() {
     }
     else if(c==CTRL_KEY('l'))
     {
-      int cccc=fork();
-      int exit_clr;
-      if(cccc==0)
-      {
-        char* argvv[]={"/usr/bin/clear",NULL};
-        execvp(argvv[0],argvv);
-        exit(666);
-      }
-        do{//waiting for last to exit
-                    waitpid(cccc,&exit_clr,WUNTRACED);
-                    }while(!WIFEXITED(exit_clr)&&WIFSIGNALED(exit_clr));
-     // printf("outside clear\n");
+      char* clear[]={"/usr/bin/clear",NULL};
+      exec_w(clear[0],clear);
       return buf.b;
     }
     else if (c == KEY_ENTER) {

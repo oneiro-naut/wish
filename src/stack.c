@@ -1,6 +1,6 @@
 #include<string.h>
 #include<stddef.h>
-#include "stack.h"
+#include "../include/stack.h"
 
 void init_stack(STACK* s)
 {
