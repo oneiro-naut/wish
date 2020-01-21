@@ -19,22 +19,23 @@ Some features are:
 #### Running on local machine
 You will need a Linux machine to run this shell.
 
-##### Dependencies:
+###### Dependencies:
 - gcc
 - cmake
+
+After installing dependencies,
 
 Run the following commands:
 ```
 $ make
 ```
-Then an executable will be generated in ./bin/
+Then an executable will be generated in ./bin/ , you can run it using
 
 ```
-$ cd bin
-$ ./wish
+$ bin/wish
 ```
 
-To exit the shell write `exit` in the shell.
+To exit the shell write `exit` or press `Ctrl+D` in the shell.
 
 #### To be added: 
 -  Shell Scripting 
