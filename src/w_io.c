@@ -7,9 +7,24 @@
 #include <fcntl.h>
 
 
+
+
+
+void restore_std_fd()
+{
+    redir_in_to(STD_IN_DUP);
+    redir_out_to(STD_OUT_DUP);
+    redir_err_to(STD_ERR_DUP);
+    STD_IN_DUP =0;//0
+    STD_OUT_DUP =1;//1
+    STD_ERR_DUP =2;//2
+
+}
+
 int redir_in_to(int fd) // used by pipes 
 {
-    //int stdin_fd=dup(1);
+    
+    STD_IN_DUP = dup(0);
     dup2(fd,0);
 
     return 0;
@@ -18,16 +33,28 @@ int redir_in_to(int fd) // used by pipes
 
 int redir_out_to(int fd) // 1 >& fd or >& fd
 {
-    //int stdout_fd=dup(1);
+    
+    STD_OUT_DUP = dup(1);
     dup2(fd,1);
 
     return 0;
 }
 
 
+
+int redir_err_to(int fd)
+{
+    STD_ERR_DUP = dup(2);
+    dup2(fd,2);
+    return 0;
+}
+
+
+
 int out_to_file(const char * filepath)// cmd > filename or > filename or 1 > filename
 {
     int file_fd= open(filepath,O_WRONLY|O_CREAT,S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH); //added mode because of O_CREAT flag 
+    STD_OUT_DUP = dup(1);
     dup2(file_fd,1);
 
     return file_fd;
@@ -36,6 +63,7 @@ int out_to_file(const char * filepath)// cmd > filename or > filename or 1 > fil
 int append_to_file(const char * filepath)// cmd >> filename or >> filename or 1 >> filename
 {
     int file_fd= open(filepath,O_WRONLY|O_CREAT|O_APPEND,S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH);//added mode because of O_CREAT flag 
+    STD_OUT_DUP = dup(1);
     dup2(file_fd,1);
 
     return file_fd;
@@ -44,6 +72,7 @@ int append_to_file(const char * filepath)// cmd >> filename or >> filename or 1 
 int err_to_file(const char *filepath)
 {
     int file_fd= open(filepath,O_WRONLY|O_CREAT,S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH);//added mode because of O_CREAT flag 
+    STD_ERR_DUP = dup(2);
     dup2(file_fd,2);
 
     return file_fd;
@@ -53,7 +82,8 @@ int err_to_file(const char *filepath)
 int append_err_to_file(const char *filepath)
 {
     int file_fd= open(filepath,O_WRONLY|O_CREAT|O_APPEND,S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH);//added mode because of O_CREAT flag 
-    dup2(file_fd,1);
+    STD_ERR_DUP = dup(2);
+    dup2(file_fd,2);
 
     return file_fd;
 }
@@ -86,6 +116,8 @@ int redir(int M,int N) // M >& N
 int rdir_err_out_to_file(const char* filename) // &> filename //new to BASH
 {
     int file_fd = open(filename,O_WRONLY|O_CREAT,S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH);
+    STD_OUT_DUP = dup(1);
+    STD_ERR_DUP = dup(2);
     dup2(file_fd,1);
     dup2(file_fd,2);
     return file_fd;

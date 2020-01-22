@@ -82,6 +82,12 @@ int wish_init()
 
     initreadLine(INPUTSIZE);
     
+    STD_IN_DUP =0;//0
+    STD_OUT_DUP =1;//1
+    STD_ERR_DUP =2;//2
+
+
+
     // Retrieving hostname from /etc/hostaname file
     FILE *file = fopen("/etc/hostname","r");
     host_name=(char *)malloc(15*sizeof(char));

@@ -1,8 +1,15 @@
 #ifndef W_IO_H
 #define W_IO_H
 
+
+int STD_IN_DUP ;//0
+int STD_OUT_DUP ;//1
+int STD_ERR_DUP ;//2
+
+void restore_std_fd();//restores redirected std streams
 int redir_in_to(int fd); // used by pipes
 int redir_out_to(int fd); // 1 >& fd or >& fd
+int redir_err_to(int fd);
 int out_to_file(const char * filepath); // cmd > filename or > filename or 1 > filename
 int append_to_file(const char * filepath); // cmd >> filename or >> filename or 1 >> filename
 int err_to_file(const char *filepath); // 2>filename

@@ -9,6 +9,11 @@
 #define TOKSIZE 100
 
 
+int STD_IN_DUP ;//0
+int STD_OUT_DUP ;//1
+int STD_ERR_DUP ;//2
+
+
 char* stream;
 char PWD[1000];
 STACK DIRSTACK;

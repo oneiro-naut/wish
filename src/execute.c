@@ -57,6 +57,30 @@ static int create_pipeline(int* pipefd_arr,int n_pipes)
 
 }
 
+
+static int check_builtins(char* cmd_name)
+{
+    if(strcmp(cmd_name,"exit")==0)return 0;
+        else if(strcmp(cmd_name,"cd")==0)
+        {
+            //changedir(argv);
+            return 0;
+        }
+        else if(strcmp(cmd_name,"roit")==0)
+        {
+            
+            //printf("I love environmental science!\n");
+            return 0;
+        }
+        else return -1;//ie this was not a builtin
+
+
+
+
+
+
+}
+
 static int execute_builtins(char* cmd_name,char** argv)
 {
         if(strcmp(cmd_name,"exit")==0)exit(0);
@@ -67,6 +91,7 @@ static int execute_builtins(char* cmd_name,char** argv)
         }
         else if(strcmp(cmd_name,"roit")==0)
         {
+            
             printf("I love environmental science!\n");
             return 0;
         }
@@ -95,17 +120,18 @@ int execute_pipeline(char*** argp,int npipes,int file_output_flag)//executes a p
 	int pipefd[2*npipes];
     if(create_pipeline(pipefd,npipes)==-1)exit(666);
     
-    int file_fd = 0;//
+    int file_fd = -1;// never ever init any fd with positive values man it produced dangerous bug
     int EXIT_STAT;
     int ci=0;//command counter
     int internal = -1;//-1 for external and 0 for internal
+    int pre_ =-1;
     pid_t pid[npipes+1];
     for (int i=0;i<=npipes;i++)pid[i]=-1;
 
         //parent function calls here
     while(argp[ci]&&ci<=npipes){
     
-        if((internal=execute_builtins(argp[ci][0],argp[ci]))==-1){
+        if((internal=check_builtins(argp[ci][0]))==-1 ){
         pid[ci]=fork();
 
         if( pid[ci]==0 ) //child process inside this if
@@ -136,16 +162,23 @@ int execute_pipeline(char*** argp,int npipes,int file_output_flag)//executes a p
         
         }
          //parent process 
-        else if(pid[ci] > 0)ci++;
+        else if(pid[ci] > 0)
+        {
+            ci++;
+            pre_ = -1;
+    
+        }
         else return -1; //fork error
     
     }
     
         
     else if(internal == 0) {
-            if(ci)redir_in_to(pipefd[(ci-1)*2]); //start of pipe
+        pid[ci]=-1;
+            pre_ = 0;
+            if(ci)redir_in_to(pipefd[(ci-1)*2]); //input redir of pipe
             
-            if(ci<npipes)redir_out_to(pipefd[ci*2+1]); // between start and end
+            if(ci<npipes)redir_out_to(pipefd[ci*2+1]); // output redir of pipe
         
         //possible pipe ends
             if(ci==npipes&&file_output_flag==1)
@@ -155,10 +188,9 @@ int execute_pipeline(char*** argp,int npipes,int file_output_flag)//executes a p
             else if(ci==npipes&&file_output_flag==2)
                 file_fd=append_to_file(argp[ci+1][0]);
                     
-
+        execute_builtins(argp[ci][0],argp[ci]);
 
         ci++;    
-            
        
  
 
@@ -173,12 +205,15 @@ int execute_pipeline(char*** argp,int npipes,int file_output_flag)//executes a p
             close( pipefd[k] );
     }
     
+    //restore shell stdin and stdout
+    restore_std_fd();
+
     for(int b=0;b<=npipes;b++)waitfor(pid[b]); //waiting for last child process to exit(terminate)
+    close(file_fd);////important was causing shell to hang
     return 0;
 
 }
 
-//still to be implemented********(needs to be implemented immediately) ****internal command execution support needs to be added
 int execute_cmd_struct(cmd_struct* cmd)
 {
     int i = 0;
