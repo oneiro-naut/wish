@@ -1,5 +1,6 @@
 #ifndef CMD_STRUCT_H
 #define CMD_STRUCT_H
+
 typedef struct cmd_struct
 {
     char**** argp_arr; // contains cmd argv for each command for each pipeline
@@ -11,4 +12,5 @@ typedef struct cmd_struct
 
 void init_cmd_struct(cmd_struct** cmd);
 void free_cmd_struct(cmd_struct** cmd);
+
 #endif

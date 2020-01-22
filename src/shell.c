@@ -5,25 +5,20 @@
 #include <time.h>
 #include "../include/execute.h"
 #include "../include/w_parser.h"
+#include "../include/w_env.h"
 
 
-#define INPUTSIZE 1000//sufficient length
-#define CMDPERINPUT 10	//sufficient size of cmd queue array
-#define PATHLEN 1000 
-#define DIRSTCKSIZE 20  //
-#define TOKSIZE 100
 
-
-char *host_name;
-char *user_name;
-extern char** environ;
+// char *host_name;
+// char *user_name;
+// extern char** environ;
 //char* envp[]={"/bin:/usr/bin/"};
-char** CMD[10];//command queue array basically array of argv[]
-char* stream;
+
+
 pid_t shell_PID;
 int EXIT_STAT;
-char PWD[1000];
-STACK DIRSTACK;
+// char PWD[1000];
+// STACK DIRSTACK;
 
 
 //******************************************** Function Declarations ********************************************************************
@@ -155,77 +150,3 @@ void shell_loop()
 
 
 // }
-
-void changedir(char **argv)
-{
-    //char *temp;
-    int dir_found=2;
-    if(strlen(argv[1])>1){
-       if(argv[1][0]=='/')
-        {
-            
-            dir_found=chdir(argv[1]);
-            //getcwd(PWD,PATHLEN);
-        }
-        else
-        {
-            push(&DIRSTACK,PWD);
-            strcat(PWD,"/");
-            strcat(PWD,argv[1]);
-            dir_found=chdir(PWD);
-        }
-         //dir_found=chdir(argv[1]);
-
-    }
-    else if(strlen(argv[1])==1){
-        if(argv[1][0]=='-')
-        {
-        
-            if(DIRSTACK.top!=-1)dir_found=chdir(pop(&DIRSTACK));
-            else printf("No previous working directory!\n");
-            push(&DIRSTACK,PWD);
-            //push(&DIRSTACK,PWD);
-            //getcwd(PWD,PATHLEN);
-        }
-        else if(argv[1][0]=='~')
-        {
-            push(&DIRSTACK,PWD);
-            dir_found=chdir(getenv("HOME"));
-            //push(&DIRSTACK,PWD);
-            //getcwd(PWD,PATHLEN);
-        }
-        else if(argv[1][0]=='/')
-        {
-            push(&DIRSTACK,PWD);
-            dir_found=chdir(argv[1]);
-            //push(&DIRSTACK,PWD);
-            //getcwd(PWD,PATHLEN);
-        }
-        else if(argv[1][0]=='.')
-        {
-            //push(&DIRSTACK,PWD);
-            //strcat(PWD,"/");
-            //strcat(PWD,argv[1]);
-            //dir_found=chdir(PWD);
-            //getcwd(PWD,PATHLEN);
-        }
-        else {
-            //dir_found=chdir(argv[1]);
-            push(&DIRSTACK,PWD);
-            strcat(PWD,"/");
-            strcat(PWD,argv[1]);
-            dir_found=chdir(PWD);
-        }
-    }
-    if(dir_found==-1){
-        perror("Error:");
-    }
-    else if(dir_found==0){
-        
-        getcwd(PWD,PATHLEN);
-    }
-    
-    
-
-}
-
