@@ -61,6 +61,27 @@ static int render_lbuf(lbuf *buf)
   return shift;
 }
 
+/**
+ * Be nice to the user.
+ * Revert back to original settings.
+ */
+void disableRawMode(){
+  tcsetattr(0, TCSANOW, &oterm);
+}
+
+
+/**
+ * Stores original terminal settings.
+ * Disables canonical mode and echoing of characters.
+ */   
+int enableRawMode(){
+  tcgetattr(0, &oterm);
+  memcpy(&term, &oterm, sizeof(term));
+  term.c_lflag &= ~(ICANON | ECHO);  
+  tcsetattr(0, TCSANOW, &term);
+  atexit(disableRawMode);
+}
+
 
 void die(const char *s) {
   write(STDOUT_FILENO, "\x1b[2J", 4);
@@ -73,19 +94,18 @@ void die(const char *s) {
 static int getch(char* c,int vmin,int vtime)// returns immediate char hit to c
 {
     int ret = 0;
-
-    tcgetattr(0, &oterm);//original term config struct= oterm here
-    memcpy(&term, &oterm, sizeof(term));//copying that to term struct
-    //modifying the copy 
-    term.c_lflag &= ~(ICANON | ECHO);//turn off echo(char type wont be printed to term) and canonical mode(line by line read mode) to raw mode(byte by byte read mode)
-    //term.c_lflag &= ~(ICANON );
     term.c_cc[VMIN] = vmin;//min number bytes to be read before read returns it is 1 B here 
     term.c_cc[VTIME] = vtime;//read timeout after which it returns
-    tcsetattr(0, TCSANOW, &term);//setting new config using our modified term config struct
+    
+    //modifying the copy 
+    
+    //term.c_lflag &= ~(ICANON );
+    
+    //setting new config using our modified term config struct
     ret = getchar();//tcsanow == apply change immediately
     *c = ret;
     //ret =read(STDIN_FILENO, c, 1);
-    tcsetattr(0, TCSANOW, &oterm);//reverted back to original config
+    
     return ret;
 }
 
@@ -164,7 +184,7 @@ char *readLine() {
     if (c == DEL_KEY || c == CTRL_KEY('h') || c == BACKSPACE) {
       deletechar(&buf);
     } 
-    else if(c==CTRL_KEY('d'))
+    else if(c==CTRL_KEY('c'))
     {
       putchar('\n');
       exit(0);

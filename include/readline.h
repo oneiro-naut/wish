@@ -55,4 +55,6 @@ static void insertchar(lbuf *v_buf,char c);
 static void deletechar(lbuf* v_buf);
 static int getch(char* c,int vmin,int vtime);
 static int editorReadKey();
+extern int enableRawMode();
+extern void disableRawMode();
 

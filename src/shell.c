@@ -55,16 +55,16 @@ void sighandler(int);
 
 int main()
 {
-  //  printf("Welcome to wish shell !\n");
+    //  printf("Welcome to wish shell !\n");
     //a function to retreive hostname and user 
-   struct sigaction act;//must not be global since it belongs only to parent process
-
-   memset(&act, 0, sizeof(act));
-   act.sa_handler = sighandler;
+    struct sigaction act;//must not be global since it belongs only to parent process
+    enableRawMode();
+    memset(&act, 0, sizeof(act));
+    act.sa_handler = sighandler;
     act.sa_flags=0;//not SA_RESTART
-   sigaction(SIGINT,  &act, 0);//should work only for parent process 
-   sigaction(SIGTSTP, &act, 0);//
- 
+    sigaction(SIGINT,  &act, 0);//should work only for parent process 
+    sigaction(SIGTSTP, &act, 0);//
+
     wish_init(); //initialize globals
     //getprompt();
     shell_loop();
@@ -119,17 +119,14 @@ void shell_loop()
     cmd_struct* current_cmd_struct = NULL;
 
     while(1){
-        /* code */
-        printPrompt();   
-
+        printPrompt();  
         stream=readLine();
         //parse function here
         current_cmd_struct = parse_input(stream);
         execute_cmd_struct(current_cmd_struct);
         free_cmd_struct(&current_cmd_struct);
         if(stream!=NULL){free(stream); //free cant free NULL lol
-        stream= NULL;}
-    
+        stream= NULL;}    
     }
 }
 
