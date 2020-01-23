@@ -69,7 +69,6 @@ static int check_builtins(char* cmd_name)
         else if(strcmp(cmd_name,"roit")==0)
         {
             
-            //printf("I love environmental science!\n");
             return 0;
         }
         else return -1;//ie this was not a builtin
@@ -91,8 +90,12 @@ static int execute_builtins(char* cmd_name,char** argv)
         }
         else if(strcmp(cmd_name,"roit")==0)
         {
-            
             printf("I love environmental science!\n");
+            printf("I love jaypee pankha!\n");
+            fflush(stdout);
+            
+            //printf("I love environmental science!\n");
+            //fflush(stdout);//(part of fix::internal piped to external)::reason::
             return 0;
         }
         else return -1;//ie this was not a builtin
@@ -137,16 +140,17 @@ int execute_pipeline(char*** argp,int npipes,int file_output_flag)//executes a p
         if( pid[ci]==0 ) //child process inside this if
         {
         
-
+            restore_std_fd();
+            //internal cmd piped to external fix:
+            //https://stackoverflow.com/questions/59866269/grep-hangs-when-executed-using-execvp-function-in-my-c-program 
             if(ci)redir_in_to(pipefd[(ci-1)*2]); //start of pipe
-            
+            //dup2(STD_OUT_DUP,1);//necessary if child inherits already redirected std fd(part of fix)
             if(ci<npipes)redir_out_to(pipefd[ci*2+1]); // between start and end
         
         //possible pipe ends
             if(ci==npipes&&file_output_flag==1)
                 file_fd=out_to_file(argp[ci+1][0]);
-                                                       //S_IRWXU --> permissions are same as touch cmd to user who created file
-                                                        // --rw-r--r-
+    
             else if(ci==npipes&&file_output_flag==2)
                 file_fd=append_to_file(argp[ci+1][0]);
                     
@@ -157,16 +161,18 @@ int execute_pipeline(char*** argp,int npipes,int file_output_flag)//executes a p
         
             
 			execvp(*argp[ci],argp[ci]); //executes current cmd
-			perror("command not found!\n");
+			perror("\n");
 			exit(0);
         
         }
          //parent process 
         else if(pid[ci] > 0)
         {
+            
+            
+            restore_std_fd();//it causes the EOF to happen if internal cmd is connected to external by pipe(part of fix)
             ci++;
-            pre_ = -1;
-    
+        
         }
         else return -1; //fork error
     
@@ -183,11 +189,11 @@ int execute_pipeline(char*** argp,int npipes,int file_output_flag)//executes a p
         //possible pipe ends
             if(ci==npipes&&file_output_flag==1)
                 file_fd=out_to_file(argp[ci+1][0]);
-                                                       //S_IRWXU --> permissions are same as touch cmd to user who created file
-                                                        // --rw-r--r-
+    
             else if(ci==npipes&&file_output_flag==2)
                 file_fd=append_to_file(argp[ci+1][0]);
                     
+        
         execute_builtins(argp[ci][0],argp[ci]);
 
         ci++;    
@@ -200,15 +206,18 @@ int execute_pipeline(char*** argp,int npipes,int file_output_flag)//executes a p
     
     
         }
-        
+    //restore shell stdin and stdout
+    restore_std_fd();      
+     
+
     for( int k = 0; k < 2 * npipes; k++ ){
             close( pipefd[k] );
     }
-    
-    //restore shell stdin and stdout
-    restore_std_fd();
 
-    for(int b=0;b<=npipes;b++)waitfor(pid[b]); //waiting for last child process to exit(terminate)
+
+    for(int b=0;b<=npipes;b++)
+        waitfor(pid[b]); //waiting for last child process to exit(terminate)
+
     close(file_fd);////important was causing shell to hang
     return 0;
 

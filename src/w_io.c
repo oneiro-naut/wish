@@ -6,7 +6,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-
+//research on dup3 pipe 2 and O_CLOSEXEC flag needed along fcntl function
 
 
 
@@ -14,7 +14,10 @@ void restore_std_fd()
 {
     redir_in_to(STD_IN_DUP);
     redir_out_to(STD_OUT_DUP);
-    redir_err_to(STD_ERR_DUP);
+    redir_err_to(STD_ERR_DUP);//since these redir will create more dup s
+    close(STD_IN_DUP); //https://stackoverflow.com/questions/43316836/do-duplicated-descriptor-files-get-closed-after-closing-the-original-file-descri
+    close(STD_OUT_DUP);//this step is so damn important here otherwise program will keep hanging since duplicates will be open in 
+    close(STD_ERR_DUP);//in background this was causing the internal piped to external to hang at one point
     STD_IN_DUP =0;//0
     STD_OUT_DUP =1;//1
     STD_ERR_DUP =2;//2
