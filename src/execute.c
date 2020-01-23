@@ -82,10 +82,11 @@ static int check_builtins(char* cmd_name)
 
 static int execute_builtins(char* cmd_name,char** argv)
 {
-        if(strcmp(cmd_name,"exit")==0)exit(0);
+        if(strcmp(cmd_name,"exit")==0)exit(0); //every internal command must follow this pattern { builtincall(); fflush(stdout); return 0;}
         else if(strcmp(cmd_name,"cd")==0)
         {
             changedir(argv);
+            fflush(stdout);
             return 0;
         }
         else if(strcmp(cmd_name,"roit")==0)
