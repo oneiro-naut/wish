@@ -11,7 +11,13 @@ void changedir(char **argv)
 {
     //char *temp;
     int dir_found=2;
-    if(strlen(argv[1])>1){
+    if(argv[1]==NULL)//cd 
+    {
+        push(&DIRSTACK,PWD);
+        dir_found=chdir(getenv("HOME"));
+            
+    }
+    else if(strlen(argv[1])>1){
        if(argv[1][0]=='/')
         {
             
@@ -69,7 +75,7 @@ void changedir(char **argv)
         }
     }
     if(dir_found==-1){
-        perror("Error:");
+        perror("\n");
     }
     else if(dir_found==0){
         

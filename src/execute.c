@@ -207,7 +207,7 @@ int execute_pipeline(char*** argp,int npipes,int file_output_flag)//executes a p
     
         }
     //restore shell stdin and stdout
-    restore_std_fd();      
+    if(internal==-1 ||file_output_flag>0)restore_std_fd();      
      
 
     for( int k = 0; k < 2 * npipes; k++ ){
