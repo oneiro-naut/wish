@@ -4,6 +4,7 @@
 #include "../include/w_env.h"
 #include <stdio.h>
 
+
 static void insertchar(lbuf *v_buf,char c)
 {
     
@@ -150,10 +151,13 @@ void initreadLine(size_t bufsize)
 
 char *readLine() {
 
+  int itr;
+  int prevStringLength=0;
   int hist=0;
   lbuf buf = {NULL,0,buffersize,0};
   buf.b =(char*)malloc(sizeof(char)*buf.size);
   buf.b[0] = '\0';
+  char *tempChar = (char*)malloc(sizeof(char)*1000);
 //  printf("crazY prompt>>");
 
   while (1) {
@@ -200,20 +204,32 @@ char *readLine() {
         }
 
     else if (c == ARROW_UP) {
-      buf.b = "";
       hist++;
       if(hist>0){
-      buf.b = printI(&HISTSTACK, hist);
+        for(itr=0;itr<prevStringLength;itr++){
+          deletechar(&buf);
+        }
+        tempChar =printI(&HISTSTACK, hist);
+        prevStringLength = strlen(tempChar);
+        for(itr=0;itr<prevStringLength;itr++){
+          insertchar(&buf,tempChar[itr]);
+        }
       }
 
 
     }
 
     else if (c == ARROW_DOWN) {
-      buf.b = "";
       hist--;
       if(hist>0){
-      buf.b = printI(&HISTSTACK,hist);
+      for(itr=0;itr<prevStringLength;itr++){
+          deletechar(&buf);
+        }
+        tempChar =printI(&HISTSTACK, hist);
+        prevStringLength = strlen(tempChar);
+        for(itr=0;itr<prevStringLength;itr++){
+          insertchar(&buf,tempChar[itr]);
+        }
       } 
     }
 
