@@ -1,6 +1,8 @@
 #include "../include/readline.h"
 #include "../include/execute.h"
-
+#include "../include/stack.h"
+#include "../include/w_env.h"
+#include <stdio.h>
 
 static void insertchar(lbuf *v_buf,char c)
 {
@@ -147,6 +149,8 @@ void initreadLine(size_t bufsize)
 }
 
 char *readLine() {
+
+  int hist=0;
   lbuf buf = {NULL,0,buffersize,0};
   buf.b =(char*)malloc(sizeof(char)*buf.size);
   buf.b[0] = '\0';
@@ -194,6 +198,25 @@ char *readLine() {
               cursorforward(1);
             }
         }
+
+    else if (c == ARROW_UP) {
+      buf.b = "";
+      hist++;
+      if(hist>0){
+      buf.b = printI(&HISTSTACK, hist);
+      }
+
+
+    }
+
+    else if (c == ARROW_DOWN) {
+      buf.b = "";
+      hist--;
+      if(hist>0){
+      buf.b = printI(&HISTSTACK,hist);
+      } 
+    }
+
     else if(CTRL_KEY(c)=='\x5e'){putchar('^');putchar('C');putchar('\n'); return buf.b; }
     else if(CTRL_KEY(c)=='\x1a'){}
     else if (!iscntrl(c) && c < 128) {     

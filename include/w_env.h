@@ -17,6 +17,7 @@ int STD_ERR_DUP ;//2
 char* stream;
 char PWD[1000];
 STACK DIRSTACK;
+STACK HISTSTACK;
 char *host_name;
 char *user_name;
 //extern char** environ;

@@ -80,6 +80,8 @@ int wish_init()
 
     init_stack(&DIRSTACK);
 
+    init_stack(&HISTSTACK);
+
     initreadLine(INPUTSIZE);
     
     STD_IN_DUP =0;//0
@@ -124,6 +126,7 @@ void shell_loop()
         printPrompt();   
 
         stream=readLine();
+        push(&HISTSTACK,stream);
         //parse function here
         current_cmd_struct = parse_input(stream);
         execute_cmd_struct(current_cmd_struct);
