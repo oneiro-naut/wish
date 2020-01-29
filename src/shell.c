@@ -126,7 +126,7 @@ void shell_loop()
         printPrompt();   
 
         stream=readLine();
-        push(&HISTSTACK,stream);
+        if(stream!=NULL)push(&HISTSTACK,stream); //el draco is cool but dont push NULL ptr to stack NULL ptr deref caused seg faults
         //parse function here
         current_cmd_struct = parse_input(stream);
         execute_cmd_struct(current_cmd_struct);

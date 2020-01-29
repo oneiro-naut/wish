@@ -152,12 +152,13 @@ void initreadLine(size_t bufsize)
 char *readLine() {
 
   int itr;
-  int prevStringLength=0;
+  static int prevStringLength=0; // so that it remembers previous cmd 's length
   int hist=0;
   lbuf buf = {NULL,0,buffersize,0};
   buf.b =(char*)malloc(sizeof(char)*buf.size);
   buf.b[0] = '\0';
-  char *tempChar = (char*)malloc(sizeof(char)*1000);
+  //char *tempChar = (char*)malloc(sizeof(char)*1000); //el draco loves malloc //dont waste memory
+  char* tempChar =NULL ;
 //  printf("crazY prompt>>");
 
   while (1) {
@@ -172,7 +173,7 @@ char *readLine() {
     if (c == DEL_KEY || c == CTRL_KEY('h') || c == BACKSPACE) {
       deletechar(&buf);
     } 
-    else if(c==CTRL_KEY('d'))
+    else if(c==CTRL_KEY('d') )
     {
       putchar('\n');
       exit(0);
@@ -186,6 +187,7 @@ char *readLine() {
     else if (c == KEY_ENTER) {
       if (buf.len >=0) {
         putchar('\n');
+        prevStringLength = buf.len;//added this
         return buf.b;
       }
     } 
@@ -204,7 +206,8 @@ char *readLine() {
         }
 
     else if (c == ARROW_UP) {
-      hist++;
+      if(prevStringLength!=0 && hist <= HISTSTACK.top){
+        hist++;
       if(hist>0){
         for(itr=0;itr<prevStringLength;itr++){
           deletechar(&buf);
@@ -215,11 +218,12 @@ char *readLine() {
           insertchar(&buf,tempChar[itr]);
         }
       }
-
+    }
 
     }
 
     else if (c == ARROW_DOWN) {
+      if(prevStringLength!=0 && hist>=0){
       hist--;
       if(hist>0){
       for(itr=0;itr<prevStringLength;itr++){
@@ -227,14 +231,21 @@ char *readLine() {
         }
         tempChar =printI(&HISTSTACK, hist);
         prevStringLength = strlen(tempChar);
-        for(itr=0;itr<prevStringLength;itr++){
+        for(itr=0;itr<prevStringLength;itr++){ //noice 
           insertchar(&buf,tempChar[itr]);
+        }
+      }
+      else if(hist==0)//experimental
+      {
+        for(itr=0;itr<prevStringLength;itr++){
+          deletechar(&buf);
+        }
         }
       } 
     }
 
-    else if(CTRL_KEY(c)=='\x5e'){putchar('^');putchar('C');putchar('\n'); return buf.b; }
-    else if(CTRL_KEY(c)=='\x1a'){}
+    //else if(CTRL_KEY(c)=='\x5e'){putchar('^');putchar('C');putchar('\n'); return buf.b; }
+    //else if(CTRL_KEY(c)=='\x1a'){}
     else if (!iscntrl(c) && c < 128) {     
       insertchar(&buf,c);
       //basically overwriting to replace with true insertion
