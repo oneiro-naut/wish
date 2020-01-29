@@ -1,6 +1,6 @@
 bin/wish
 **/posix_concepts
-
+**/test
 # Prerequisites
 *.d
 
