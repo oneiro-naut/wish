@@ -1,11 +1,11 @@
-#include "../include/readline.h"
+#include "readline.h"
 #include <dirent.h> //for directory related syscalls
-#include "../include/stack.h"
+#include "stack.h"
 #include <signal.h>
 #include <time.h>
-#include "../include/execute.h"
-#include "../include/w_parser.h"
-#include "../include/w_env.h"
+#include "execute.h"
+#include "w_parser.h"
+#include "w_env.h"
 
 
 

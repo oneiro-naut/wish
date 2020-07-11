@@ -1,2 +1,17 @@
-shellmake: src/*.c
-	mkdir -p bin && gcc -g -o ./bin/wish ./src/shell.c ./src/stack.c ./src/cmd_struct.c ./src/process.c ./src/w_env.c ./src/w_parser.c ./src/w_tokenizer.c ./src/execute.c ./src/readline.c ./src/w_io.c ./src/w_signal.c ./src/builtins.c
+IDIR =include
+CC=gcc
+CFLAGS=-I$(IDIR)
+
+CDIR=src
+BDIR=bin
+LDIR =lib
+
+LIBS=
+
+DEPS = $(wildcard $(IDIR)/*.h)
+
+SRC = $(wildcard $(CDIR)/*.c)
+
+wish: $(SRC)
+	$(CC) -g -o $(BDIR)/$@ $^ $(CFLAGS) $(LIBS)
+

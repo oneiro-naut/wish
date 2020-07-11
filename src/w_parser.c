@@ -1,6 +1,6 @@
-#include "../include/w_parser.h"
-#include "../include/w_tokenizer.h"
-#include "../include/cmd_struct.h"
+#include "w_parser.h"
+#include "w_tokenizer.h"
+#include "cmd_struct.h"
 #include <stdlib.h>
 #include <ctype.h>//isalpha(char)
 

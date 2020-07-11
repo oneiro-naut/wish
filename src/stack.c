@@ -1,6 +1,6 @@
 #include<string.h>
 #include<stddef.h>
-#include "../include/stack.h"
+#include "stack.h"
 #include <stdlib.h>
 #include <stdio.h>
 ///make a free stack function too

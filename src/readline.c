@@ -1,7 +1,7 @@
-#include "../include/readline.h"
-#include "../include/execute.h"
-#include "../include/stack.h"
-#include "../include/w_env.h"
+#include "readline.h"
+#include "execute.h"
+#include "stack.h"
+#include "w_env.h"
 #include <stdio.h>
 
 

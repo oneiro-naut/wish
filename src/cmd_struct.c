@@ -1,4 +1,4 @@
-#include "../include/cmd_struct.h"
+#include "cmd_struct.h"
 #include <stdlib.h>
 #define MAXCMDS 20
 #define MAXPIPELINES 10

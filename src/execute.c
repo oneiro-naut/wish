@@ -3,11 +3,11 @@
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
-#include "../include/builtins.h"
-#include "../include/process.h"
-#include "../include/execute.h"
-#include "../include/w_io.h"
-#include "../include/w_env.h"
+#include "builtins.h"
+#include "process.h"
+#include "execute.h"
+#include "w_io.h"
+#include "w_env.h"
 
 
 int exec_w(char* path,char** argv) //execute and wait for cmd to exit

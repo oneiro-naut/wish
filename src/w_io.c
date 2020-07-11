@@ -1,4 +1,4 @@
-#include "../include/w_io.h" //silly name for a file
+#include "w_io.h" //silly name for a file
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>

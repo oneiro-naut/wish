@@ -14,7 +14,7 @@ char** wish_tok(char* inp_str)
 {
     char** tokarr =(char**) malloc(sizeof(char*)*CMDPERINPUT);
 
-	char *p=inp_str;//so that original buffer is not affected
+	char *p=inp_str;
 	if(p==NULL){ tokarr[0]=NULL; return tokarr;}
 	char* start_of_word=NULL;
 	int index_of_token= -1;

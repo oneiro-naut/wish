@@ -1,6 +1,6 @@
-#include "../include/builtins.h"
-#include "../include/stack.h"
-#include "../include/w_env.h"
+#include "builtins.h"
+#include "stack.h"
+#include "w_env.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
