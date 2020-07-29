@@ -2,9 +2,9 @@
 #define W_IO_H
 
 
-int STD_IN_DUP ;//0
-int STD_OUT_DUP ;//1
-int STD_ERR_DUP ;//2
+extern int STD_IN_DUP ;//0
+extern int STD_OUT_DUP ;//1
+extern int STD_ERR_DUP ;//2
 
 void restore_std_fd();//restores redirected std streams
 int redir_in_to(int fd); // used by pipes

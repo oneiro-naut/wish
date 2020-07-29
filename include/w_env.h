@@ -9,17 +9,14 @@
 #define TOKSIZE 100
 
 
-int STD_IN_DUP ;//0
-int STD_OUT_DUP ;//1
-int STD_ERR_DUP ;//2
 
-
-char* stream;
-char PWD[1000];
-STACK DIRSTACK;
-STACK HISTSTACK;
-char *host_name;
-char *user_name;
+extern struct sigaction act;//should be a Global since it wont be shared anyway
+extern char* stream;
+extern char PWD[1000];
+extern STACK DIRSTACK;
+extern STACK HISTSTACK;
+extern char *host_name;
+extern char *user_name;
 //extern char** environ;
 
 
