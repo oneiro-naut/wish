@@ -8,6 +8,9 @@
 
 //research on dup3 pipe 2 and O_CLOSEXEC flag needed along fcntl function
 
+int STD_IN_DUP = 0;//0
+int STD_OUT_DUP = 1;//1
+int STD_ERR_DUP = 2;//2
 
 
 void restore_std_fd()

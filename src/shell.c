@@ -6,20 +6,23 @@
 #include "execute.h"
 #include "w_parser.h"
 #include "w_env.h"
+#include "w_io.h"
 
 
 
-// char *host_name;
-// char *user_name;
-// extern char** environ;
-//char* envp[]={"/bin:/usr/bin/"};
 
 
 pid_t shell_PID;
 int EXIT_STAT;
-// char PWD[1000];
-// STACK DIRSTACK;
 
+
+struct sigaction act;//should be a Global since it wont be shared anyway
+char* stream = NULL;
+char PWD[1000];
+STACK DIRSTACK;
+STACK HISTSTACK;
+char *host_name = NULL;
+char *user_name = NULL;
 
 //******************************************** Function Declarations ********************************************************************
 int wish_init();
@@ -52,13 +55,8 @@ int main()
 {
   //  printf("Welcome to wish shell !\n");
     //a function to retreive hostname and user 
-   struct sigaction act;//must not be global since it belongs only to parent process
+   
 
-   memset(&act, 0, sizeof(act));
-   act.sa_handler = sighandler;
-    act.sa_flags=0;//not SA_RESTART
-   sigaction(SIGINT,  &act, 0);//should work only for parent process 
-   sigaction(SIGTSTP, &act, 0);//
  
     wish_init(); //initialize globals
     //getprompt();
@@ -76,6 +74,13 @@ void sighandler(int sig_num)
 
 int wish_init()
 {
+    //setting up signal handler for Parent process that is wish shell
+   memset(&act, 0, sizeof(act));
+   act.sa_handler = sighandler;
+    act.sa_flags=0;//not SA_RESTART
+   sigaction(SIGINT,  &act, 0);//should work only for parent process 
+   sigaction(SIGTSTP, &act, 0);//
+
     getcwd(PWD,PATHLEN);
 
     init_stack(&DIRSTACK);
