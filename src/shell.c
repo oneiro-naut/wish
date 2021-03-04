@@ -1,8 +1,11 @@
-#include "readline.h"
-#include <dirent.h> //for directory related syscalls
-#include "stack.h"
+#include <readLine/readline.h>
+#include <string.h>
+#include <dirent.h> 
+#include <sys/types.h> 
 #include <signal.h>
 #include <time.h>
+
+#include "stack.h"
 #include "execute.h"
 #include "w_parser.h"
 #include "w_env.h"
@@ -77,7 +80,7 @@ int wish_init()
     //setting up signal handler for Parent process that is wish shell
    memset(&act, 0, sizeof(act));
    act.sa_handler = sighandler;
-    act.sa_flags=0;//not SA_RESTART
+   act.sa_flags=0;//not SA_RESTART
    sigaction(SIGINT,  &act, 0);//should work only for parent process 
    sigaction(SIGTSTP, &act, 0);//
 
@@ -87,7 +90,7 @@ int wish_init()
 
     init_stack(&HISTSTACK);
 
-    initreadLine(INPUTSIZE);
+    //initreadLine(INPUTSIZE);
     
     STD_IN_DUP =0;//0
     STD_OUT_DUP =1;//1

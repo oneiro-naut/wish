@@ -6,7 +6,7 @@ CDIR=src
 BDIR=bin
 LDIR =lib
 
-LIBS=
+LIBS=-lreadLine
 
 DEPS = $(wildcard $(IDIR)/*.h)
 

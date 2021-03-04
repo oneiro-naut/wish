@@ -1,4 +1,4 @@
-bin/wish
+bin/*
 **/posix_concepts
 **/test
 
