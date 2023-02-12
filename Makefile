@@ -1,17 +1,28 @@
-IDIR =include
+INCDIR =./include
 CC=gcc
-CFLAGS=-I$(IDIR)
+LD=gcc
+INCFLAGS=-I$(INCDIR)
+CFLAGS=-std=gnu99
 
-CDIR=src
-BDIR=bin
-LDIR =lib
+SRCDIR=./src
+OBJDIR=./obj
+BINDIR=./bin
+LIBDIR =./lib
 
 LIBS=-lreadLine
 
-DEPS = $(wildcard $(IDIR)/*.h)
+SRCS = $(wildcard $(SRCDIR)/*.c)
+OBJLIST = $(SRCS:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
+SRCLIST=
 
-SRC = $(wildcard $(CDIR)/*.c)
+$(BINDIR)/wish: $(OBJLIST)
+	mkdir -p $(BINDIR)
+	$(LD) -g $(CFLAGS) $(INCFLAGS) $^ $(LIBS) -o $@
 
-wish: $(SRC)
-	$(CC) -g -o $(BDIR)/$@ $^ $(CFLAGS) $(LIBS)
+$(OBJDIR)/%.o: $(SRCDIR)/%.c
+	mkdir -p $(OBJDIR)
+	$(CC) -g $(CFLAGS) $(INCFLAGS) -c $^ -o $@
+
+clean:
+	rm bin/* obj/*
 
