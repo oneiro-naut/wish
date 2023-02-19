@@ -162,7 +162,9 @@ int execute_pipeline(char*** argp,int npipes,int file_output_flag)//executes a p
         
             
 			execvp(*argp[ci],argp[ci]); //executes current cmd
-			perror("\n");
+                        char errStr[2048];
+                        sprintf(errStr, "bash: %s", *argp[ci]);
+			perror(errStr);
 			exit(0);
         
         }
