@@ -1,19 +1,18 @@
 #ifndef EXECUTE_H
 #define EXECUTE_H
-
 #include "cmd_struct.h"
 
-int exec_w(char* path,char** argv); //execute and wait for cmd to exit
+// execute and wait for cmd to exit
+int exec_w(char* path, char** argv);
 
-int exec_bg(char* path,char** argv);//execute and return pid of child
+// execute and return pid of child
+int exec_bg(char* path, char** argv);
 
-//executes a pipeline of commands cmd | cmd ...| cmd [> filename] | [>> filename]
-int execute_pipeline(char*** argp,int npipes,int file_output_flag);
+// execute a pipeline of commands cmd | cmd ...| cmd [> filename] | [>> filename]
+int execute_pipeline(char*** argp, int npipes, int file_output_flag);
 
-static int create_pipeline(int* pipefd_arr,int n_pipes);
+// execute parsed wish input
+int execute_cmd_struct(cmd_struct* cmd);
 
-int execute_cmd_struct(cmd_struct* cmd);//executes parsed wish input
-
-
-#endif
+#endif //EXECUTE_H
 
